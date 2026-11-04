@@ -1,0 +1,40 @@
+# Developed By github.com/@mairhythmhoon
+name: Task-03 Log Mail Sender
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send-logs:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Create Secure folder
+        run: mkdir -p Secure
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > Secure/.env
+
+      - name: Create Gmail OAuth credentials
+        run: printf '%s' '${{ secrets.GMAIL_CREDENTIALS_JSON }}' > Secure/gmail-credentials.json
+
+      - name: Create Gmail OAuth token
+        run: printf '%s' '${{ secrets.GMAIL_TOKEN_JSON }}' > Secure/gmail-token.json
+
+      - name: Run Task-03 (Log Mail Sender)
+        run: npm run task03

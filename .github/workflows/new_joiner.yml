@@ -1,0 +1,68 @@
+# Developed By github.com/@mairhythmhoon
+name: Task-02
+
+on:
+  schedule:
+    - cron: "30 0,4,8,12 * * *"   # 06:00, 10:00, 14:00, 18:00 IST
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Show trigger info
+        run: |
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "UTC Time: $(date -u)"
+          echo "IST Time: $(TZ=Asia/Kolkata date)"
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "mairhythmhoon"
+          git config --global user.email "rhythm.work.id@proton.me"
+
+      - name: Create Secure folder
+        run: mkdir -p Secure
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > Secure/.env
+
+      - name: Create credentials.json
+        run: printf '%s' '${{ secrets.CREDENTIALS_JSON }}' > Secure/credentials.json
+
+      - name: Create Gmail OAuth credentials
+        run: printf '%s' '${{ secrets.GMAIL_CREDENTIALS_JSON }}' > Secure/gmail-credentials.json
+
+      - name: Create Gmail OAuth token
+        run: printf '%s' '${{ secrets.GMAIL_TOKEN_JSON }}' > Secure/gmail-token.json
+
+      - name: Run Task-02 (New Joiner)
+        run: npm run task02
+
+      - name: Mask User Data
+        run: node .dist/mask_data.js
+
+      - name: Commit & Push changes
+        run: |
+          git add .
+          git commit -m "Auto update by Task02 at : $(TZ=Asia/Kolkata date)" || echo "No changes to commit"
+          git push

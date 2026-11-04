@@ -1,0 +1,161 @@
+# Developed By github.com/@mairhythmhoon
+name: Monthly Log Cleanup
+
+on:
+  # Runs on 1st day of every month at 6:00 AM IST
+  schedule:
+    - cron: "00 0 1 * *"
+
+  # Manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  cleanup_logs:
+    # Runs only from schedule or manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    name: Clear old log files
+    runs-on: ubuntu-24.04
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      # Show trigger information
+      - name: Show trigger info
+        run: |
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "UTC Time: $(date -u)"
+          echo "IST Time: $(TZ=Asia/Kolkata date)"
+
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Run log_sender.yml first
+      - name: Run log_sender.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Starting Task-03 Log Mail Sender"
+
+          BEFORE_RUN=$(gh run list \
+            --workflow="log_sender.yml" \
+            --repo="${{ github.repository }}" \
+            --limit=1 \
+            --json databaseId \
+            --jq '.[0].databaseId // empty')
+
+          echo "Previous run ID: ${BEFORE_RUN:-None}"
+
+          gh workflow run log_sender.yml \
+            --repo="${{ github.repository }}"
+
+          echo "log_sender.yml triggered successfully."
+          echo "Waiting for new workflow run..."
+
+          RUN_ID=""
+
+          for i in {1..30}; do
+            RUN_ID=$(gh run list \
+              --workflow="log_sender.yml" \
+              --repo="${{ github.repository }}" \
+              --limit=10 \
+              --json databaseId,status,createdAt \
+              --jq '[.[] | select(.databaseId > '"${BEFORE_RUN:-0}"')] | sort_by(.databaseId) | last | .databaseId // empty')
+
+            if [ -n "$RUN_ID" ]; then
+              break
+            fi
+
+            echo "Waiting for log_sender.yml run to appear... ($i/30)"
+            sleep 2
+          done
+
+          if [ -z "$RUN_ID" ]; then
+            echo "ERROR: Could not find the newly triggered log_sender.yml run."
+            exit 1
+          fi
+
+          echo "New log_sender.yml Run ID: $RUN_ID"
+          echo "Waiting for log_sender.yml to finish..."
+
+          while true; do
+            RUN_INFO=$(gh run view "$RUN_ID" \
+              --repo="${{ github.repository }}" \
+              --json status,conclusion)
+
+            STATUS=$(echo "$RUN_INFO" | jq -r '.status')
+            CONCLUSION=$(echo "$RUN_INFO" | jq -r '.conclusion')
+
+            echo "Status: $STATUS"
+            echo "Conclusion: $CONCLUSION"
+
+            if [ "$STATUS" = "completed" ]; then
+              break
+            fi
+
+            echo "log_sender.yml is still running..."
+            sleep 10
+          done
+
+          # Stop cleanup if log_sender failed
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "ERROR: log_sender.yml FAILED"
+            echo "Cleanup will NOT run."
+            exit 1
+          fi
+
+          echo "log_sender.yml completed successfully."
+          echo "Starting cleanup task..."
+
+      # Clean old log files
+      - name: Clean log files
+        run: |
+          if [ ! -d "Logs" ]; then
+            echo "Logs folder not found."
+            exit 0
+          fi
+
+          IST_TIME=$(TZ=Asia/Kolkata date "+%d-%m-%Y %I:%M:%S %p IST")
+
+          find Logs -type f -name "*.log" | while read -r file; do
+            TEMP_FILE=$(mktemp)
+
+            {
+              echo "========================================"
+              echo "Old logs cleaned by monthly scheduler"
+              echo "Cleanup Time: $IST_TIME"
+              echo "========================================"
+              echo ""
+
+              # Keep latest 10 lines
+              tail -n 10 "$file"
+            } > "$TEMP_FILE"
+
+            mv "$TEMP_FILE" "$file"
+
+            echo "Cleaned: $file"
+          done
+
+      # Commit changes
+      - name: Commit changes
+        run: |
+          git config --global user.name "mairhythmhoon"
+          git config --global user.email "rhythm.work.id@proton.me"
+
+          git add Logs/
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Monthly cleanup of log files"
+          fi
+
+      # Push changes
+      - name: Push changes
+        run: git push
