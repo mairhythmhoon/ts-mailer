@@ -36,7 +36,7 @@ Automate birthday wishes, festival greetings, new-joiner emails, and monthly log
 ```text
 Google Sheets ──(service account)──▶ local JSON data ──▶ task workflow
                                                            │
-HTML templates ◀──────────────────────────────────────────┤
+HTML templates ◀─-─────────────────────────────────────────┤
                                                            ▼
 Gmail API ◀──(OAuth 2.0 user authorization)──────── rendered email
                                                            │
