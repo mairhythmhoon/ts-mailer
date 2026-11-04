@@ -19,6 +19,11 @@ jobs:
           echo "Triggered by: ${{ github.event_name }}"
           echo "UTC Time: $(date -u)"
           echo "IST Time: $(TZ=Asia/Kolkata date)"
+      
+      - name: Set timezone to IST
+        run: |
+          sudo timedatectl set-timezone Asia/Kolkata
+          date   # (optional: shows current IST time in logs)
 
       - name: Checkout code
         uses: actions/checkout@v5
