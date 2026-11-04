@@ -29,17 +29,19 @@ Automate birthday wishes, festival greetings, new-joiner emails, and monthly log
 
 > **Please note:** This project can send real emails to real recipients. Configure it with your own test spreadsheet and test addresses first. Do not run it against a contact list unless you have permission to email those people.
 
+---
+
 ## 🧭 How it works
 
 ```text
 Google Sheets ──(service account)──▶ local JSON data ──▶ task workflow
-                                                            │
-HTML templates ◀─────────────────────────────────────────────┤
-                                                            ▼
-Gmail API ◀──(OAuth 2.0 user authorization)────────────── rendered email
-                                                            │
-                                                            ▼
-                              send/run summaries ──▶ Google Sheets
+                                                           │
+HTML templates ◀──────────────────────────────────────────┤
+                                                           ▼
+Gmail API ◀──(OAuth 2.0 user authorization)──────── rendered email
+                                                           │
+                                                           ▼
+                             send/run summaries ──▶ Google Sheets
 ```
 
 1. A task starts and loads configuration from `Secure/.env`.
@@ -49,6 +51,8 @@ Gmail API ◀──(OAuth 2.0 user authorization)──────────�
 5. The task records worker and email activity in configured spreadsheet tabs. Task 02 also maintains `Data/last_run.json` as its time-window checkpoint.
 
 **There are two separate Google identities/credentials:** the Sheets service account accesses the spreadsheet you share with it, while the Gmail OAuth user is the account that sends the email. They can be associated with the same Google account, but do not have to be.
+
+---
 
 ## 🧰 Working tree
 
@@ -74,7 +78,7 @@ ts-mailer/
 │   └── log_template.html
 ├── Task01.ts                # Birthday and festival/custom-event messages
 ├── Task02.ts                # New-joiner messages
-├── Task03.ts                # Monthly ZIP log report email
+├── Task03.ts                # Monthly ZIP log report
 ├── mask_data.ts             # Masks personal data in Data/data.json
 ├── service.ts               # Shared setup, validation, templates and counters
 ├── package.json
@@ -83,6 +87,8 @@ ts-mailer/
 
 `Secure/`, `node_modules/`, and `.dist/` are excluded from Git. Keep credentials and OAuth tokens private; never commit them.
 
+---
+
 ## ✅ Requirements
 
 - Node.js **24** (the GitHub Actions workflows use Node 24).
@@ -90,6 +96,8 @@ ts-mailer/
 - A Google account with Gmail and Google Sheets access.
 - A Google Cloud project with the Gmail and Sheets APIs enabled.
 - A spreadsheet and its ID, plus OAuth client credentials, a Gmail OAuth token, and a Sheets service-account key.
+
+---
 
 ## 🚀 Run locally
 
@@ -100,7 +108,9 @@ npm ci
 npm run build
 ```
 
-Create `Secure/` and add the configuration and credential files described below. Once Google authorization and your test sheet are ready, run one workflow at a time:
+Create `Secure/` and add the configuration and credential files described below.
+
+Once Google authorization and your test sheet are ready, run one workflow at a time:
 
 ```bash
 npm run task01   # birthdays + festivals/custom events
@@ -109,6 +119,8 @@ npm run task03   # ZIP and email the log report
 ```
 
 The scripts compile TypeScript into `.dist/` before running. Task 01 and Task 02 use live contact data and can send to every matching record; verify your sheet and recipients before invoking them.
+
+---
 
 ## 🔐 Configure Google APIs for your account
 
@@ -120,14 +132,24 @@ The scripts compile TypeScript into `.dist/` before running. Task 01 and Task 02
 
 ### 2. Set up Gmail OAuth (the sending account)
 
-The Gmail module uses OAuth 2.0 with the `https://www.googleapis.com/auth/gmail.send` scope. It loads these files:
+The Gmail module uses OAuth 2.0 with the `https://www.googleapis.com/auth/gmail.send` scope.
+
+It loads these files:
 
 - `Secure/gmail-credentials.json` — OAuth client credentials downloaded from Google Cloud. The code accepts the `installed` or `web` OAuth client JSON format.
 - `Secure/gmail-token.json` — an authorized user's OAuth token, including a refresh token where issued.
 
-Create an OAuth client in **Google Cloud Console → APIs & Services → Credentials**. Choose a client type that matches the authorization flow you use (a desktop app is commonly suitable for local development), then save the downloaded JSON as `Secure/gmail-credentials.json`.
+Create an OAuth client in **Google Cloud Console → APIs & Services → Credentials**.
 
-**A token must be authorized for the same Gmail account that should send the mail and include the Gmail send scope.** This repository expects the token file to already exist; it does not provide an interactive first-time OAuth authorization command. Complete Google's OAuth consent flow with a trusted local OAuth tool or a small, reviewed one-time authorization helper, then save the resulting token as `Secure/gmail-token.json`. Do not paste credentials or tokens into source code, issues, or chat. The application writes refreshed token values back to this file when Google returns them, so the file must be writable and kept secret.
+Choose a client type that matches the authorization flow you use (a desktop app is commonly suitable for local development), then save the downloaded JSON as `Secure/gmail-credentials.json`.
+
+**A token must be authorized for the same Gmail account that should send the mail and include the Gmail send scope.**
+
+This repository expects the token file to already exist; it does not provide an interactive first-time OAuth authorization command. Complete Google's OAuth consent flow with a trusted local OAuth tool or a small, reviewed one-time authorization helper, then save the resulting token as `Secure/gmail-token.json`.
+
+Do not paste credentials or tokens into source code, issues, or chat.
+
+The application writes refreshed token values back to this file when Google returns them, so the file must be writable and kept secret.
 
 Set `E_MAIL` to the sending address for your account. Gmail must permit that account to send using the configured From address.
 
@@ -137,7 +159,11 @@ Set `E_MAIL` to the sending address for your account. Gmail must permit that acc
 2. Open that JSON and copy the service account's `client_email` value.
 3. Share your spreadsheet with that service-account email address and grant the access needed by your workflows. Reading requires viewer access; appending rows requires edit access.
 4. Copy the spreadsheet ID from its URL. For a URL like `https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit`, the ID is the part between `/d/` and `/edit`.
-5. Configure the required sheet names/ranges and headers in your spreadsheet. The application reads the first row as headers and turns subsequent rows into JSON objects. The code refers to ranges/tabs such as `Sheet-01`, `custom_events`, `Sheet-02`, `Sheet-03`, `Task_01`, and `Task_02`; use matching names and adapt the task or configuration if your sheet layout differs.
+5. Configure the required sheet names/ranges and headers in your spreadsheet.
+
+The application reads the first row as headers and turns subsequent rows into JSON objects.
+
+The code refers to ranges/tabs such as `Sheet-01`, `custom_events`, `Sheet-02`, `Sheet-03`, `Task_01`, and `Task_02`; use matching names and adapt the task or configuration if your sheet layout differs.
 
 The Sheets client uses the `https://www.googleapis.com/auth/spreadsheets` scope and the service-account key; it does not use the Gmail OAuth token.
 
@@ -147,18 +173,35 @@ Create `Secure/.env` with the values consumed by the application:
 
 ```dotenv
 SPREADSHEET_ID=your_google_spreadsheet_id
+
 E_MAIL=your-sender@gmail.com
+
 RESPONS_MAILE=your-reply-to-or-report-recipient@example.com
 ```
 
-`SPREADSHEET_ID` identifies the spreadsheet. `E_MAIL` is used as the From address. `RESPONS_MAILE` is used for Reply-To and by Task 03 as the log-report recipient (the variable name is intentionally shown exactly as used by the code).
+- `SPREADSHEET_ID` identifies the spreadsheet.
+- `E_MAIL` is used as the From address.
+- `RESPONS_MAILE` is used for Reply-To and by Task 03 as the log-report recipient.
+
+The variable name `RESPONS_MAILE` is intentionally shown exactly as used by the code.
 
 ### 5. Confirm the spreadsheet data and templates
 
 - Task 01 expects contact headers including `Name`, `Email address`, and optionally `Birthdate` in `DD/MM/YYYY` format.
 - Task 02 expects `Name`, `Email address`, and a `Timestamp` in `DD/MM/YYYY HH:MM:SS` format.
 - `custom_events` is fetched to `Data/custom_events.json`; event dates are compared as `DD-MM-YYYY`.
-- Customize the HTML files in `Template/`. Keep the placeholders used by the task: `{name}` for birthday and joiner templates, `{name}` and `{festival}` for festival messages, and `{month}` for the log report.
+- Customize the HTML files in `Template/`.
+
+Keep the placeholders used by the task:
+
+| Template | Placeholders |
+|---|---|
+| Birthday | `{name}` |
+| Festival | `{name}`, `{festival}` |
+| Thank You | `{name}` |
+| Log Report | `{month}` |
+
+---
 
 ## ⚙️ GitHub Actions
 
@@ -166,12 +209,14 @@ The repository includes these workflows:
 
 | Workflow | Purpose | Schedule in the workflow file | Manual run |
 |---|---|---|---|
-| `fest_bday.yml` | Task 01: birthday and festival/custom-event emails | Daily at 08:00 India Standard Time (IST) | Yes |
+| `fest_bday.yml` | Task 01: birthday and festival/custom-event emails | Daily at 08:00 IST | Yes |
 | `new_joiner.yml` | Task 02: new-joiner emails | 06:00, 10:00, 14:00, and 18:00 IST | Yes |
 | `log_sender.yml` | Task 03: send a ZIP log report | No schedule; manually dispatched | Yes |
 | `log_cleanup.yml` | Trigger log report, then keep the latest 10 lines in log files | Monthly on day 1 at 05:30 IST | Yes |
 
 GitHub Actions cron schedules are expressed in UTC. The times above are converted from the cron definitions in the workflow files; scheduled runs can be delayed by GitHub.
+
+### Configure GitHub Actions
 
 To run these workflows in your own repository:
 
@@ -180,7 +225,7 @@ To run these workflows in your own repository:
 3. Review workflow permissions, especially workflows that commit and push changes to the repository.
 4. Open **Actions**, select a workflow, and choose **Run workflow** to test manually.
 
-The current workflows use these secret names:
+### Required GitHub Actions secrets
 
 | GitHub Actions secret | Contents |
 |---|---|
@@ -189,7 +234,11 @@ The current workflows use these secret names:
 | `GMAIL_CREDENTIALS_JSON` | Full Gmail OAuth client JSON |
 | `GMAIL_TOKEN_JSON` | Full authorized Gmail token JSON |
 
-These are materialized as files under `Secure/` during workflow runs. Restrict access to repository secrets, rotate credentials if exposed, and never print their values in workflow logs.
+These are materialized as files under `Secure/` during workflow runs.
+
+Restrict access to repository secrets, rotate credentials if exposed, and never print their values in workflow logs.
+
+---
 
 ## 🗂️ Data and logs
 
@@ -198,6 +247,8 @@ These are materialized as files under `Secure/` during workflow runs. Restrict a
 - `Logs/system.log` records informational activity; `Logs/error.log` contains errors. The logger creates the `Logs/` directory as needed.
 - Task 03 archives `.log` files recursively and emails the ZIP to `RESPONS_MAILE`; its temporary archive is cleaned up afterward.
 - `mask_data.ts` masks selected fields in `Data/data.json`. It **overwrites the file**, so keep a backup and do not treat masking as a substitute for protecting the original data.
+
+---
 
 ## 🧪 Available npm scripts
 
@@ -208,14 +259,7 @@ These are materialized as files under `Secure/` during workflow runs. Restrict a
 | `npm run task02` | Builds and runs the new-joiner task |
 | `npm run task03` | Builds and runs the log-report task |
 
-## 🔒 Security and responsible use
-
-- Never commit `Secure/`, service-account keys, OAuth client secrets, OAuth tokens, or real contact data.
-- Keep local `.env` and JSON credentials backed up securely, with access limited to the people and systems that need them.
-- Use a dedicated test spreadsheet and test recipients before enabling schedules.
-- Request only the Google API scopes the workflow needs; protect and rotate credentials if they are exposed.
-- Email addresses and contact details are personal data. Follow applicable privacy, consent, and email-sending rules.
-- Sending through Gmail is subject to Google's account limits and policies. This project does not guarantee delivery or bypass those limits.
+---
 
 ## 💡 Interesting details
 
@@ -225,6 +269,8 @@ These are materialized as files under `Secure/` during workflow runs. Restrict a
 - The Gmail module creates MIME messages itself and supports text or HTML, CC/BCC, and attachments.
 - The application records Gmail message IDs with its email activity, making it easier to correlate a send with the Gmail response.
 - Task 02's checkpoint-based window helps it find newly joined records instead of resending a thank-you to every contact on every run.
+
+---
 
 ## 🛠️ Troubleshooting
 
@@ -237,14 +283,144 @@ These are materialized as files under `Secure/` during workflow runs. Restrict a
 | Emails are not sent | Check `Logs/error.log`, recipient addresses, DNS/MX lookup access, Gmail API/account limits, and OAuth consent/test-user settings. |
 | Workflow cannot write repository changes | Check workflow `contents: write` permission and repository/branch protection rules. |
 
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you have ideas, bug fixes, or improvements, feel free to contribute.
+
+### How to contribute
+
+1. **Fork** the repository.
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`).
+3. **Commit** your changes (`git commit -m 'Add AmazingFeature'`).
+4. **Push** to your branch (`git push origin feature/AmazingFeature`).
+5. **Open** a Pull Request describing your changes.
+
+### Areas for contribution
+
+- 📧 Additional email templates and notification workflows.
+- 🎨 Enhanced HTML email designs.
+- 🌍 Internationalization and multi-language support.
+- ⚡ Performance and reliability improvements.
+- 📊 Enhanced Google Sheets integration and reporting.
+- 🧪 Automated testing and error handling.
+- 🔧 Improved scheduling and workflow management.
+
+---
+
+## 📚 Documentation
+
+### Module Details
+
+**`Module/Gmail.ts`** – Gmail integration module
+
+- Gmail API integration using OAuth 2.0.
+- MIME email message construction.
+- HTML and plain-text email support.
+- CC, BCC, Reply-To, and attachments.
+- Gmail message ID tracking.
+
+**`Module/Google_Sheet.ts`** – Google Sheets integration
+
+- Google Sheets API integration using a service account.
+- Spreadsheet data retrieval and synchronization.
+- Appending worker activity and email records.
+- Task execution summaries.
+
+**`Module/Calendar.ts`** – Festival calendar module
+
+- Fetches public Hindu and Indian holiday calendars.
+- Parses festival dates and event information.
+- Merges calendar data and removes duplicate entries.
+- Maintains chronological festival records.
+
+**`Module/logs.ts`** – Logging module
+
+- Winston-based logging.
+- Informational and error log management.
+- Local log file generation.
+- Development console logging.
+
+**`service.ts`** – Shared service module
+
+- Common task initialization and configuration.
+- Environment and configuration validation.
+- HTML template loading and processing.
+- Shared counters and task utilities.
+
+### Task Details
+
+**`Task01.ts`** – Birthday and festival automation
+
+- Birthday detection and personalized greetings.
+- Festival and custom-event notifications.
+- Multiple event processing.
+- Google Sheets activity synchronization.
+
+**`Task02.ts`** – New-joiner automation
+
+- Detects newly added contact records.
+- Sends personalized thank-you emails.
+- Uses timestamp-based processing.
+- Maintains a checkpoint to avoid repeatedly processing old records.
+
+**`Task03.ts`** – Monthly log reporting
+
+- Collects application log files.
+- Generates a ZIP archive.
+- Sends monthly reports through Gmail.
+- Cleans up temporary archive files.
+
+---
+
+## 📞 Contact & Support
+
+### Get in Touch
+
+- **GitHub:** [@mairhythmhoon](https://github.com/mairhythmhoon)
+- **Email:** [rhythm.work.id@proton.me](mailto:rhythm.work.id@proton.me)
+- **Instagram:** [@mairhythmhoon](https://instagram.com/mairhythmhoon)
+- **LinkedIn:** [@mairhythmhoon](https://linkedin.com/in/mairhythmhoon)
+
+For bug reports, feature requests, or technical discussions, feel free to open an issue in the repository.
+
+---
+
+## 💡 Future Enhancements
+
+Potential improvements planned for future versions:
+
+- Advanced scheduling with configurable cron expressions.
+- Multi-language email template support.
+- User preference and notification management.
+- Automated email list segmentation.
+- Improved retry mechanisms and failure recovery.
+- Enhanced email delivery and execution analytics.
+- More configurable automation workflows.
+- Expanded automated testing and validation.
+
+---
+
 ## 📄 License
 
-The package currently declares the **ISC** license. See `package.json` and confirm the repository's license terms before redistribution.
+This project is open source and distributed under the **ISC License**.
+
+See the [LICENSE](LICENSE) file in the repository for the complete license terms.
 
 ---
 
 <div align="center">
 
-Made with TypeScript, Gmail, Google Sheets, and a little automation ✨
+### ⭐ Support the Project
+
+---
+If you find this project useful, please consider giving it a **star ⭐** on GitHub.
+
+Your support helps the project grow and encourages further development.
+
+**Built with ❤️ using TypeScript, Gmail API, and Google Sheets by [mairhythmhoon](https://github.com/mairhythmhoon)**
 
 </div>
+
+---
