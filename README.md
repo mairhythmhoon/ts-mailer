@@ -212,7 +212,7 @@ The repository includes these workflows:
 | `fest_bday.yml` | Task 01: birthday and festival/custom-event emails | Daily at 08:00 IST | Yes |
 | `new_joiner.yml` | Task 02: new-joiner emails | 06:00, 10:00, 14:00, and 18:00 IST | Yes |
 | `log_sender.yml` | Task 03: send a ZIP log report | No schedule; manually dispatched | Yes |
-| `log_cleanup.yml` | Trigger log report, then keep the latest 10 lines in log files | Monthly on day 1 at 05:30 IST | Yes |
+| `log_cleanup.yml` | Trigger log report, then keep the latest 10 lines in log files | Monthly on day 1 at 07:30 IST | Yes |
 
 GitHub Actions cron schedules are expressed in UTC. The times above are converted from the cron definitions in the workflow files; scheduled runs can be delayed by GitHub.
 
