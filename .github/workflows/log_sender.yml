@@ -30,11 +30,8 @@ jobs:
       - name: Create .env file
         run: echo "${{ secrets.ENV_FILE }}" > Secure/.env
 
-      - name: Create Gmail OAuth credentials
-        run: printf '%s' '${{ secrets.GMAIL_CREDENTIALS_JSON }}' > Secure/gmail-credentials.json
-
-      - name: Create Gmail OAuth token
-        run: printf '%s' '${{ secrets.GMAIL_TOKEN_JSON }}' > Secure/gmail-token.json
+      - name: Create credentials.json
+        run: printf '%s' '${{ secrets.CREDENTIALS_JSON }}' > Secure/credentials.json
 
       - name: Run Task-03 (Log Mail Sender)
         run: npm run task03
