@@ -1,11 +1,12 @@
-import * as fs from "fs";
+const fs = require("fs");
+const path = require("path");
 
-function maskText(text: string | null | undefined, visibleStart = 2, visibleEnd = 2): string {
-  if (!text) {
-    return text as string;
-  }
+function maskText(text: string | null | undefined): string {
+  if (text == null || text === "") return "";
 
   const str = String(text);
+  const visibleStart = 2;
+  const visibleEnd = 2;
 
   if (str.length <= visibleStart + visibleEnd) {
     return "*".repeat(str.length);
@@ -35,45 +36,44 @@ function maskEmail(email: string | null | undefined): string {
   return `${maskedUsername}@${domain}`;
 }
 
-const DATA_FILE = "Data/data.json";
+function maskBirthdate(value: string | null | undefined): string {
+  const bd = String(value ?? "").trim();
+  let year = "****";
 
-// Read data.json
+  const m1 = bd.match(/\/(\d{4})$/); // DD/MM/YYYY
+  const m2 = bd.match(/^(\d{4})-/);  // YYYY-MM-DD
+  if (m1) year = m1[1];
+  else if (m2) year = m2[1];
+
+  return `**/**/${year}`;
+}
+
+const DATA_FILE = path.join(__dirname, "Data", "data.json");
+
 const raw = fs.readFileSync(DATA_FILE, "utf-8");
-const data: Record<string, unknown>[] = JSON.parse(raw);
+const parsed = JSON.parse(raw);
+if (!Array.isArray(parsed)) {
+  throw new Error(`${DATA_FILE} must contain a JSON array`);
+}
 
-// Mask sensitive fields
+const data: Record<string, unknown>[] = parsed;
+
 for (const record of data) {
   if ("Name" in record) {
     record["Name"] = maskText(record["Name"] as string);
   }
-
   if ("Email address" in record) {
     record["Email address"] = maskEmail(record["Email address"] as string);
   }
-
   if ("Responder Email Address" in record) {
     record["Responder Email Address"] = maskEmail(
       record["Responder Email Address"] as string
     );
   }
-
   if ("Birthdate" in record) {
-    const birthdate = String(record["Birthdate"]).trim();
-
-    let year: string;
-    if (birthdate.includes("/")) {
-      year = birthdate.split("/").pop()!;
-    } else if (birthdate.includes("-")) {
-      year = birthdate.split("-")[0]; // Handles YYYY-MM-DD
-    } else {
-      year = "****";
-    }
-
-    record["Birthdate"] = `**/**/${year}`;
+    record["Birthdate"] = maskBirthdate(record["Birthdate"] as string);
   }
 }
 
-// Overwrite the same file
 fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 4), "utf-8");
-
 console.log(`${DATA_FILE} has been masked successfully.`);

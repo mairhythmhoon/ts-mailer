@@ -1,24 +1,28 @@
 // Developed By github.com/@mairhythmhoon
 import * as fs from "fs";
 import * as path from "path";
+import * as dotenv from "dotenv";
+
+dotenv.config({path:"Secure/.env"});
 
 interface FestivalEvent {
     date: string;
     festival_name: string;
-    calendar: string;
 }
 
 async function main_(): Promise<void> {
     const CURRENT_YEAR = new Date().getFullYear();
 
-    const CALENDARS: Record<string, string> = {
-        Hindu: "https://calendar.google.com/calendar/ical/en.hinduism%23holiday%40group.v.calendar.google.com/public/basic.ics",
-        Indian: "https://calendar.google.com/calendar/ical/en-in.indian%23holiday%40group.v.calendar.google.com/public/basic.ics",
-    };
+    const CALENDAR_URL = process.env.CALENDAR_URL;
+
+if (!CALENDAR_URL) {
+        console.error("Missing CALENDAR_URL in .env file");
+        process.exit(1);
+    }
 
     const OUTPUT_FILE = path.join("Data", "festivals.json");
 
-    function parseIcs(icsText: string, calendarName: string): FestivalEvent[] {
+    function parseIcs(icsText: string): FestivalEvent[] {
         const events: FestivalEvent[] = [];
         const lines = icsText.split(/\r?\n/);
         let event: Partial<FestivalEvent> = {};
@@ -46,7 +50,6 @@ async function main_(): Promise<void> {
                     events.push({
                         date: event.date,
                         festival_name: event.festival_name,
-                        calendar: calendarName,
                     });
                 }
             }
@@ -55,55 +58,33 @@ async function main_(): Promise<void> {
         return events;
     }
 
-    const allEvents: FestivalEvent[] = [];
-
-    for (const [calendarName, url] of Object.entries(CALENDARS)) {
-        try {
-            const response = await fetch(url, {
-                signal: AbortSignal.timeout(30_000),
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status} ${response.statusText}`);
-            }
-            const text = await response.text();
-            allEvents.push(...parseIcs(text, calendarName));
-        } catch (e) {
-            console.error(`Failed to fetch ${calendarName} calendar:`, e);
-        }
-    }
-
-    // Merge duplicate festivals
-    const mergedEvents = new Map<string, FestivalEvent>();
-
-    for (const event of allEvents) {
-        const key = `${event.date}|${event.festival_name}`;
-
-        if (!mergedEvents.has(key)) {
-            mergedEvents.set(key, { ...event });
-        } else {
-            // Same festival exists in another calendar
-            mergedEvents.get(key)!.calendar = "merged";
-        }
-    }
-
     // Sort by date (DD-MM-YYYY)
     const parseDate = (d: string): number => {
         const [day, month, year] = d.split("-").map(Number);
         return new Date(year, month - 1, day).getTime();
     };
 
-    const finalEvents = Array.from(mergedEvents.values()).sort(
-        (a, b) => parseDate(a.date) - parseDate(b.date)
-    );
-
     try {
-        // Ensure the output directory exists
+        const response = await fetch(CALENDAR_URL, {
+            signal: AbortSignal.timeout(30_000),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        const events = parseIcs(text).sort(
+            (a, b) => parseDate(a.date) - parseDate(b.date)
+        );
+
         fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(finalEvents, null, 4), {
+        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(events, null, 4), {
             encoding: "utf-8",
         });
+
+        console.log(`Wrote ${events.length} events to ${OUTPUT_FILE}`);
     } catch (e) {
-        console.error("Failed to write output file:", e);
+        console.error("Failed to fetch or write calendar:", e);
     }
 }
 
