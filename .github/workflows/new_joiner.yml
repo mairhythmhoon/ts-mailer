@@ -64,7 +64,7 @@ jobs:
         run: npm run task02
 
       - name: Mask User Data
-        run: node .dist/mask_data.js
+        run:  node mask_data.ts
 
       - name: Commit & Push changes
         run: |
