@@ -1,5 +1,237 @@
 [
     {
+        "date": "01-01-2026",
+        "festival_name": "New Year's Day"
+    },
+    {
+        "date": "12-01-2026",
+        "festival_name": "National Youth Day"
+    },
+    {
+        "date": "14-01-2026",
+        "festival_name": "Makar Sankranti"
+    },
+    {
+        "date": "15-01-2026",
+        "festival_name": "Indian Army Day"
+    },
+    {
+        "date": "23-01-2026",
+        "festival_name": "Subhas Chandra Bose Jayanti"
+    },
+    {
+        "date": "24-01-2026",
+        "festival_name": "National Girl Child Day"
+    },
+    {
+        "date": "26-01-2026",
+        "festival_name": "Republic Day"
+    },
+    {
+        "date": "30-01-2026",
+        "festival_name": "Shaheed Diwas"
+    },
+    {
+        "date": "01-02-2026",
+        "festival_name": "Indian Coast Guard Day"
+    },
+    {
+        "date": "02-02-2026",
+        "festival_name": "World Wetlands Day"
+    },
+    {
+        "date": "12-02-2026",
+        "festival_name": "Swami Dayanand Saraswati Jayanti"
+    },
+    {
+        "date": "14-02-2026",
+        "festival_name": "Black Day"
+    },
+    {
+        "date": "21-02-2026",
+        "festival_name": "International Mother Language Day"
+    },
+    {
+        "date": "25-02-2026",
+        "festival_name": "Ravishankar Maharaj Jayanti"
+    },
+    {
+        "date": "28-02-2026",
+        "festival_name": "National Science Day"
+    },
+    {
+        "date": "03-03-2026",
+        "festival_name": "World Wildlife Day"
+    },
+    {
+        "date": "08-03-2026",
+        "festival_name": "International Women's Day"
+    },
+    {
+        "date": "20-03-2026",
+        "festival_name": "World Sparrow Day"
+    },
+    {
+        "date": "21-03-2026",
+        "festival_name": "International Day of Forests"
+    },
+    {
+        "date": "22-03-2026",
+        "festival_name": "World Water Day"
+    },
+    {
+        "date": "23-03-2026",
+        "festival_name": "Balidan Divas"
+    },
+    {
+        "date": "05-04-2026",
+        "festival_name": "National Maritime Day"
+    },
+    {
+        "date": "14-04-2026",
+        "festival_name": "Dr. B. R. Ambedkar Jayanti"
+    },
+    {
+        "date": "22-04-2026",
+        "festival_name": "Earth Day"
+    },
+    {
+        "date": "24-04-2026",
+        "festival_name": "National Panchayati Raj Day"
+    },
+    {
+        "date": "01-05-2026",
+        "festival_name": "Gujarat Gaurav Diwas"
+    },
+    {
+        "date": "11-05-2026",
+        "festival_name": "National Technology Day"
+    },
+    {
+        "date": "20-05-2026",
+        "festival_name": "World Bee Day"
+    },
+    {
+        "date": "22-05-2026",
+        "festival_name": "International Day for Biological Diversity"
+    },
+    {
+        "date": "31-05-2026",
+        "festival_name": "World \"No Tobacco\" Day"
+    },
+    {
+        "date": "05-06-2026",
+        "festival_name": "World Environment Day"
+    },
+    {
+        "date": "08-06-2026",
+        "festival_name": "World Oceans Day"
+    },
+    {
+        "date": "21-06-2026",
+        "festival_name": "International Day of Yoga"
+    },
+    {
+        "date": "01-07-2026",
+        "festival_name": "National Doctors' Day"
+    },
+    {
+        "date": "11-07-2026",
+        "festival_name": "World Population Day"
+    },
+    {
+        "date": "26-07-2026",
+        "festival_name": "Kargil Vijay Diwas"
+    },
+    {
+        "date": "29-07-2026",
+        "festival_name": "International Tiger Day"
+    },
+    {
+        "date": "09-08-2026",
+        "festival_name": "Adivasi Diwas"
+    },
+    {
+        "date": "10-08-2026",
+        "festival_name": "World Lion Day"
+    },
+    {
+        "date": "12-08-2026",
+        "festival_name": "Vikram Sarabhai Jayanti"
+    },
+    {
+        "date": "12-08-2026",
+        "festival_name": "World Elephant Day"
+    },
+    {
+        "date": "15-08-2026",
+        "festival_name": "Independence Day"
+    },
+    {
+        "date": "24-08-2026",
+        "festival_name": "Vishwa Gujarati Bhasha Diwas"
+    },
+    {
+        "date": "28-08-2026",
+        "festival_name": "Jhaverchand Meghani Jayanti"
+    },
+    {
+        "date": "29-08-2026",
+        "festival_name": "National Sports Day"
+    },
+    {
+        "date": "30-08-2026",
+        "festival_name": "International Whale Shark Day"
+    },
+    {
+        "date": "05-09-2026",
+        "festival_name": "Teachers' Day"
+    },
+    {
+        "date": "15-09-2026",
+        "festival_name": "National Engineers' Day"
+    },
+    {
+        "date": "16-09-2026",
+        "festival_name": "World Ozone Day"
+    },
+    {
+        "date": "22-09-2026",
+        "festival_name": "World Rhino Day"
+    },
+    {
+        "date": "02-10-2026",
+        "festival_name": "Gandhi Jayanti"
+    },
+    {
+        "date": "04-10-2026",
+        "festival_name": "World Animal Welfare Day"
+    },
+    {
+        "date": "05-10-2026",
+        "festival_name": "National Dolphin Day"
+    },
+    {
+        "date": "08-10-2026",
+        "festival_name": "Indian Air Force Day"
+    },
+    {
+        "date": "15-10-2026",
+        "festival_name": "World Students' Day"
+    },
+    {
+        "date": "24-10-2026",
+        "festival_name": "Programmer's Day"
+    },
+    {
+        "date": "31-10-2026",
+        "festival_name": "Sardar Patel Jayanti / Rashtriya Ekta Diwas"
+    },
+    {
+        "date": "07-11-2026",
+        "festival_name": "National Cancer Awareness Day"
+    },
+    {
         "date": "10-11-2026",
         "festival_name": "નૂતન વર્ષ"
     },
@@ -10,5 +242,61 @@
     {
         "date": "14-11-2026",
         "festival_name": "લાભ પાંચમ"
+    },
+    {
+        "date": "14-11-2026",
+        "festival_name": "Bal Diwas"
+    },
+    {
+        "date": "19-11-2026",
+        "festival_name": "International Men's"
+    },
+    {
+        "date": "20-11-2026",
+        "festival_name": "World Children's Day"
+    },
+    {
+        "date": "24-11-2026",
+        "festival_name": "Guru Nanak Jayanti"
+    },
+    {
+        "date": "26-11-2026",
+        "festival_name": "Constitution Day"
+    },
+    {
+        "date": "02-12-2026",
+        "festival_name": "National Pollution Control Day"
+    },
+    {
+        "date": "04-12-2026",
+        "festival_name": "Indian Navy Day"
+    },
+    {
+        "date": "05-12-2026",
+        "festival_name": "World Soil Day"
+    },
+    {
+        "date": "07-12-2026",
+        "festival_name": "Armed Forces Flag Day"
+    },
+    {
+        "date": "14-12-2026",
+        "festival_name": "National Energy Conservation Day"
+    },
+    {
+        "date": "16-12-2026",
+        "festival_name": "Vijay Diwas"
+    },
+    {
+        "date": "22-12-2026",
+        "festival_name": "National Mathematics Day"
+    },
+    {
+        "date": "25-12-2026",
+        "festival_name": "Christmas"
+    },
+    {
+        "date": "26-12-2026",
+        "festival_name": "Veer Bal Diwas"
     }
 ]
