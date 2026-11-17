@@ -506,3 +506,16 @@
 17-11-2026 13:43:14 | INFO     | Task02.js:236 | Adding Email Send Data.
 17-11-2026 13:43:15 | INFO     | Task02.js:243 | =========== Task 02 Stopped.=============
 17-11-2026 13:43:15 | INFO     | Task02.js:244 | ===== EMAIL SYSTEM STOPPED =====
+17-11-2026 16:32:04 | INFO     | service.js:235 | ===== EMAIL SYSTEM STARTED =====
+17-11-2026 16:32:04 | INFO     | service.js:238 | .env file is loaded
+17-11-2026 16:32:05 | INFO     | service.js:248 | Calendar module's main_() is running
+17-11-2026 16:32:05 | INFO     | service.js:256 | custom events fetched from Google Sheet
+17-11-2026 16:32:05 | INFO     | service.js:176 | Today's festivals loaded
+17-11-2026 16:32:05 | INFO     | Task01.js:223 | =========== Task 01 is Running.=============
+17-11-2026 16:32:06 | INFO     | Task01.js:227 | Fetching Data From Database.
+17-11-2026 16:32:06 | INFO     | Task01.js:134 | >> No Birthdays today.
+17-11-2026 16:32:06 | INFO     | Task01.js:241 | Nothing to add in Daily-Stats
+17-11-2026 16:32:06 | INFO     | Task01.js:261 | Recording worker run (Sheet-02).
+17-11-2026 16:32:06 | INFO     | Task01.js:270 | Adding Email Send Data.
+17-11-2026 16:32:06 | INFO     | Task01.js:277 | =========== Task 01 Stoped.=============
+17-11-2026 16:32:06 | INFO     | Task01.js:278 | ===== EMAIL SYSTEM STOPED =====
